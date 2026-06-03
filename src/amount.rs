@@ -1,6 +1,6 @@
 use crate::{currency::Currency, errors::ErrorCode};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Amount {
     value: i64,
     currency: Currency,
