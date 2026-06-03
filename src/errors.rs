@@ -3,5 +3,6 @@ pub enum ErrorCode {
     InvalidAmount,
     MathError,
 
-    MismatchedCurrency
+    MismatchedCurrency,
+    UnbalancedTransfer,
 }

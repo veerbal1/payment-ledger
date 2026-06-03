@@ -17,6 +17,10 @@ impl Amount {
         })
     }
 
+    pub fn value(&self) -> i64 {
+        self.value
+    }
+
     pub fn checked_add(&self, amount: &Amount) -> Result<Amount, ErrorCode> {
         if self.currency != amount.currency {
             return Err(ErrorCode::MismatchedCurrency);

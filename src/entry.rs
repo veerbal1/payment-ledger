@@ -5,6 +5,15 @@ pub enum LedgerDirection {
     Debit,
 }
 
+impl LedgerDirection {
+    pub fn sign(&self) -> i64 {
+        match self {
+            LedgerDirection::Credit => 1,
+            LedgerDirection::Debit => -1,
+        }
+    }
+}
+
 pub struct LedgerEntry {
     id: String,
     account_id: String,
@@ -28,6 +37,22 @@ impl LedgerEntry {
             direction,
             transfer_id,
         }
+    }
+
+    pub fn amount(&self) -> &Amount {
+        &self.amount
+    }
+
+    pub fn direction(&self) -> &LedgerDirection {
+        &self.direction
+    }
+
+    pub fn set_transfer_id(&mut self, transfer_id: String) {
+        self.transfer_id = transfer_id
+    }
+
+    pub fn account_id(&self) -> &String {
+        &self.account_id
     }
 }
 
@@ -66,5 +91,17 @@ mod tests {
         assert_eq!(entry.account_id, "acc-1");
         assert_eq!(entry.transfer_id, "tx-1");
         assert!(matches!(entry.direction, LedgerDirection::Debit));
+    }
+
+    #[test]
+    fn test_ledger_direction_positive() {
+        let direction = LedgerDirection::Credit;
+        assert_eq!(direction.sign(), 1);
+    }
+
+    #[test]
+    fn test_ledger_direction_negative() {
+        let direction = LedgerDirection::Debit;
+        assert_eq!(direction.sign(), -1);
     }
 }
