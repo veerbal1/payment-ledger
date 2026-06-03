@@ -1,6 +1,8 @@
 use axum::{Router, http::StatusCode};
 use tokio::net::TcpListener;
 
+use payment_ledger::handlers::create_transfer;
+
 async fn home() -> (StatusCode, String) {
     (StatusCode::OK, "home".to_string())
 }
@@ -10,11 +12,12 @@ async fn health() -> (StatusCode, String) {
 }
 
 pub fn create_app() -> Router {
-    use axum::routing::get;
+    use axum::routing::{get, post};
 
     Router::new()
-        .route("/", get(home))
-        .route("/health", get(health))
+        .route("/v1", get(home))
+        .route("/v1/health", get(health))
+        .route("/v1/transfers", post(create_transfer))
 }
 
 #[tokio::main]

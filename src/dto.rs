@@ -1,11 +1,22 @@
+use serde::{Deserialize, Serialize};
+
 use crate::entry::LedgerEntry;
 use crate::errors::ErrorCode;
 use crate::transfer::compute_balance;
 
+#[derive(Deserialize, Serialize)]
 pub struct CreateTransferRequest {
     pub from_account_id: String,
     pub to_account_id: String,
     pub amount: i64,
+}
+
+#[derive(Serialize)]
+pub struct CreateTransferResponse {
+    pub status: String,
+    pub transfer_id: Option<String>,
+    pub error: Option<String>,
+    pub retryable: Option<bool>,
 }
 
 impl CreateTransferRequest {

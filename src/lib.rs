@@ -5,3 +5,4 @@ mod dto;
 mod entry;
 mod errors;
 mod transfer;
+pub mod handlers;
