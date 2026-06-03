@@ -26,7 +26,7 @@ impl Transfer {
                 let amount = entry.amount();
                 let direction = entry.direction().sign();
                 let net = amount.value() * direction;
-                return net;
+                net
             })
             .sum();
         if sum != 0 {
