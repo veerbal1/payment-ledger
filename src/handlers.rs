@@ -45,6 +45,7 @@ pub async fn create_transfer(
             transfer_id: None,
             error: Some(format!("{:?}", err)),
             retryable: Some(err.is_retryable()),
+            idempotency_key: Some(req.idempotency_key),
         };
         return (err.http_status(), Json(body));
     }
@@ -58,6 +59,7 @@ pub async fn create_transfer(
                 transfer_id: Some(id),
                 error: None,
                 retryable: None,
+                idempotency_key: Some(req.idempotency_key),
             };
             (StatusCode::OK, Json(body))
         }
@@ -67,6 +69,7 @@ pub async fn create_transfer(
                 transfer_id: None,
                 error: Some(format!("{:?}", err)),
                 retryable: Some(err.is_retryable()),
+                idempotency_key: Some(req.idempotency_key),
             };
             (err.http_status(), Json(body))
         }

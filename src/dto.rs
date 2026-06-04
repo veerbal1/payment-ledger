@@ -3,12 +3,15 @@ use serde::{Deserialize, Serialize};
 use crate::entry::LedgerEntry;
 use crate::errors::ErrorCode;
 use crate::transfer::compute_balance;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 #[derive(Deserialize, Serialize)]
 pub struct CreateTransferRequest {
     pub from_account_id: String,
     pub to_account_id: String,
     pub amount: i64,
+    pub idempotency_key: String,
 }
 
 #[derive(Serialize)]
@@ -17,11 +20,15 @@ pub struct CreateTransferResponse {
     pub transfer_id: Option<String>,
     pub error: Option<String>,
     pub retryable: Option<bool>,
+    pub idempotency_key: Option<String>,
 }
 
 impl CreateTransferRequest {
     pub fn validate(&self) -> Result<(), ErrorCode> {
-        if self.from_account_id.is_empty() || self.to_account_id.is_empty() {
+        if self.from_account_id.trim().is_empty()
+            || self.to_account_id.trim().is_empty()
+            || self.idempotency_key.trim().is_empty()
+        {
             return Err(ErrorCode::ValidationError);
         }
         if self.amount < 0 {
@@ -43,6 +50,15 @@ impl CreateTransferRequest {
         }
         Ok(())
     }
+
+    pub fn fingerprint(&self) -> String {
+        let mut hasher = DefaultHasher::new();
+        self.from_account_id.hash(&mut hasher);
+        self.to_account_id.hash(&mut hasher);
+
+        self.amount.hash(&mut hasher);
+        format!("{:x}", hasher.finish())
+    }
 }
 
 #[cfg(test)]
@@ -57,6 +73,18 @@ mod tests {
             from_account_id: String::new(),
             to_account_id: "acc-2".into(),
             amount: 100,
+            idempotency_key: "temp".to_string(),
+        };
+        assert_eq!(req.validate(), Err(ErrorCode::ValidationError));
+    }
+
+    #[test]
+    fn rejects_empty_idempotency_key() {
+        let req = CreateTransferRequest {
+            from_account_id: String::new(),
+            to_account_id: "acc-2".into(),
+            amount: 100,
+            idempotency_key: "".to_string(),
         };
         assert_eq!(req.validate(), Err(ErrorCode::ValidationError));
     }
@@ -67,6 +95,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: String::new(),
             amount: 100,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(req.validate(), Err(ErrorCode::ValidationError));
     }
@@ -77,6 +106,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-2".into(),
             amount: -50,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(req.validate(), Err(ErrorCode::InvalidAmount));
     }
@@ -87,6 +117,7 @@ mod tests {
             from_account_id: String::new(),
             to_account_id: String::new(),
             amount: 0,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(req.validate(), Err(ErrorCode::ValidationError));
     }
@@ -97,6 +128,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-2".into(),
             amount: 100,
+            idempotency_key: "temp".to_string(),
         };
         assert!(req.validate().is_ok());
     }
@@ -107,6 +139,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-1".into(),
             amount: 100,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(req.validate_business(&[]), Err(ErrorCode::SelfTransfer));
     }
@@ -117,6 +150,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-2".into(),
             amount: 0,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(req.validate_business(&[]), Err(ErrorCode::ZeroAmount));
     }
@@ -133,6 +167,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-2".into(),
             amount: 200,
+            idempotency_key: "temp".to_string(),
         };
         assert_eq!(
             req.validate_business(&[credit]),
@@ -152,6 +187,7 @@ mod tests {
             from_account_id: "acc-1".into(),
             to_account_id: "acc-2".into(),
             amount: 200,
+            idempotency_key: "temp".to_string(),
         };
         assert!(req.validate_business(&[credit]).is_ok());
     }

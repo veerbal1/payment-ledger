@@ -56,6 +56,7 @@ async fn post_transfer_inserts_transfer_and_balanced_ledger_entries() {
             from_account_id: from_account_id.clone(),
             to_account_id: to_account_id.clone(),
             amount,
+            idempotency_key: "temp".to_string()
         },
     )
     .await
@@ -104,6 +105,7 @@ async fn post_transfer_rolls_back_when_credit_account_is_missing() {
             from_account_id,
             to_account_id: format!("missing-account-{:x}", rand::random::<u128>()),
             amount: 500,
+            idempotency_key: "temp".to_string()
         },
     )
     .await;
