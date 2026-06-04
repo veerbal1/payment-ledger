@@ -3,6 +3,7 @@ use sqlx::{Postgres, postgres::PgPoolOptions};
 use tokio::net::TcpListener;
 
 use payment_ledger::handlers::create_transfer;
+use payment_ledger::state::AppState;
 
 async fn home() -> (StatusCode, String) {
     (StatusCode::OK, "home".to_string())
@@ -10,11 +11,6 @@ async fn home() -> (StatusCode, String) {
 
 async fn health() -> (StatusCode, String) {
     (StatusCode::OK, "working".to_string())
-}
-
-#[derive(Clone)]
-struct AppState {
-    pool: sqlx::PgPool,
 }
 
 pub fn create_app(pool: sqlx::Pool<Postgres>) -> Router {

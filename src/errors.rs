@@ -43,7 +43,10 @@ mod tests {
 
     #[test]
     fn insufficient_funds_status_409() {
-        assert_eq!(ErrorCode::InsufficientFunds.http_status(), StatusCode::CONFLICT);
+        assert_eq!(
+            ErrorCode::InsufficientFunds.http_status(),
+            StatusCode::CONFLICT
+        );
     }
 
     #[test]
@@ -53,7 +56,10 @@ mod tests {
 
     #[test]
     fn invalid_amount_status_400() {
-        assert_eq!(ErrorCode::InvalidAmount.http_status(), StatusCode::BAD_REQUEST);
+        assert_eq!(
+            ErrorCode::InvalidAmount.http_status(),
+            StatusCode::BAD_REQUEST
+        );
     }
 
     #[test]
@@ -63,6 +69,9 @@ mod tests {
 
     #[test]
     fn math_error_status_500() {
-        assert_eq!(ErrorCode::MathError.http_status(), StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(
+            ErrorCode::MathError.http_status(),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
     }
 }
