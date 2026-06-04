@@ -1,7 +1,7 @@
 mod account;
 mod amount;
 mod currency;
-mod dto;
+pub mod dto;
 mod entry;
 mod errors;
 pub mod handlers;
