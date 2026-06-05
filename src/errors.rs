@@ -11,6 +11,7 @@ pub enum ErrorCode {
     SelfTransfer,
     ZeroAmount,
     InsufficientFunds,
+    IdempotencyKeyReused,
 }
 
 impl ErrorCode {
@@ -28,6 +29,7 @@ impl ErrorCode {
             ErrorCode::SelfTransfer => StatusCode::BAD_REQUEST,
             ErrorCode::ZeroAmount => StatusCode::BAD_REQUEST,
             ErrorCode::InsufficientFunds => StatusCode::CONFLICT,
+            ErrorCode::IdempotencyKeyReused => StatusCode::CONFLICT,
         }
     }
 }
@@ -45,6 +47,19 @@ mod tests {
     fn insufficient_funds_status_409() {
         assert_eq!(
             ErrorCode::InsufficientFunds.http_status(),
+            StatusCode::CONFLICT
+        );
+    }
+
+    #[test]
+    fn idempotency_key_reused_not_retryable() {
+        assert!(!ErrorCode::IdempotencyKeyReused.is_retryable());
+    }
+
+    #[test]
+    fn idempotency_key_reused_status_409() {
+        assert_eq!(
+            ErrorCode::IdempotencyKeyReused.http_status(),
             StatusCode::CONFLICT
         );
     }

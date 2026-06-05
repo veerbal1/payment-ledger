@@ -1,15 +1,11 @@
 use crate::{entry::LedgerEntry, errors::ErrorCode};
 
 pub fn compute_balance(ledger_entries: &[LedgerEntry], account_id: &str) -> i64 {
-    let filtered_entries: Vec<&LedgerEntry> = ledger_entries
+    ledger_entries
         .iter()
-        .filter(|entry| entry.account_id().to_string() == account_id)
-        .collect();
-    let sum: i64 = filtered_entries
-        .iter()
+        .filter(|entry| entry.account_id() == account_id)
         .map(|entry| entry.amount().value() * entry.direction().sign())
-        .sum();
-    sum
+        .sum()
 }
 
 pub struct Transfer {
@@ -22,12 +18,7 @@ impl Transfer {
         let id = rand::random::<u64>().to_string();
         let sum: i64 = entries
             .iter()
-            .map(|entry| {
-                let amount = entry.amount();
-                let direction = entry.direction().sign();
-                let net = amount.value() * direction;
-                net
-            })
+            .map(|entry| entry.amount().value() * entry.direction().sign())
             .sum();
         if sum != 0 {
             return Err(ErrorCode::UnbalancedTransfer);
@@ -39,6 +30,14 @@ impl Transfer {
 
         let transfer = Transfer { id, entries };
         Ok(transfer)
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    pub fn entries(&self) -> &[LedgerEntry] {
+        &self.entries
     }
 }
 

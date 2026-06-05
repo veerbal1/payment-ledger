@@ -2,7 +2,7 @@ use rand::distr::{Alphanumeric, SampleString};
 
 use crate::currency::Currency;
 
-type AccountId = String;
+pub type AccountId = String;
 
 pub struct Account {
     id: AccountId,
@@ -18,6 +18,14 @@ impl Account {
 
     pub fn get_id(&self) -> AccountId {
         self.id.to_string()
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn currency(&self) -> &Currency {
+        &self.currency
     }
 }
 

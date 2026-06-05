@@ -156,6 +156,42 @@ mod tests {
     }
 
     #[test]
+    fn fingerprint_same_for_identical_requests() {
+        let req1 = CreateTransferRequest {
+            from_account_id: "acc-1".into(),
+            to_account_id: "acc-2".into(),
+            amount: 100,
+            idempotency_key: "temp".to_string(),
+        };
+        let req2 = CreateTransferRequest {
+            from_account_id: "acc-1".into(),
+            to_account_id: "acc-2".into(),
+            amount: 100,
+            idempotency_key: "temp".to_string(),
+        };
+
+        assert_eq!(req1.fingerprint(), req2.fingerprint());
+    }
+
+    #[test]
+    fn fingerprint_differs_for_different_body() {
+        let req1 = CreateTransferRequest {
+            from_account_id: "acc-1".into(),
+            to_account_id: "acc-2".into(),
+            amount: 100,
+            idempotency_key: "temp".to_string(),
+        };
+        let req2 = CreateTransferRequest {
+            from_account_id: "acc-1".into(),
+            to_account_id: "acc-2".into(),
+            amount: 200,
+            idempotency_key: "temp".to_string(),
+        };
+
+        assert_ne!(req1.fingerprint(), req2.fingerprint());
+    }
+
+    #[test]
     fn rejects_overdraft() {
         let credit = LedgerEntry::new(
             "acc-1".into(),

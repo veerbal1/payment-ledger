@@ -43,6 +43,10 @@ impl LedgerEntry {
         &self.amount
     }
 
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
     pub fn direction(&self) -> &LedgerDirection {
         &self.direction
     }
@@ -51,7 +55,7 @@ impl LedgerEntry {
         self.transfer_id = transfer_id
     }
 
-    pub fn account_id(&self) -> &String {
+    pub fn account_id(&self) -> &str {
         &self.account_id
     }
 }
